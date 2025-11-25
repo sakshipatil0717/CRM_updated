@@ -24,6 +24,7 @@ app.use("/employees", require("./routes/employeeRoutes"));
 app.use("/customers", require("./routes/customerRoutes"));
 app.use("/customer-issue", require("./routes/customerIssueRoutes"));
 app.use("/issue-review", require("./routes/issueReviewRoutes"));
+app.use("/quotationDetails", require("./routes/quotationDetailRoutes"));
 
 
 const PORT = 2000;

@@ -1,14 +1,35 @@
 
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 function Quotation() {
     const [showModal, setShowModal] = useState(false);
     const [selectedQuotation, setSelectedQuotation] = useState(null);
 
-    const quotations = [
-        { number: 'QTN-001', customer: 'John Doe', date: '2025-08-08', amount: '5000', items: [{ product: 'Widget A', qty: 2, rate: 50 }] },
-        { number: 'QTN-002', customer: 'Jane Smith', date: '2025-08-09', amount: '100', items: [{ product: 'Widget B', qty: 1, rate: 100 }] }
-    ];
+    // const quotations = [
+    //     { number: 'QTN-001', customer: 'John Doe', date: '2025-08-08', amount: '5000', items: [{ product: 'Widget A', qty: 2, rate: 50 }] },
+    //     { number: 'QTN-002', customer: 'Jane Smith', date: '2025-08-09', amount: '100', items: [{ product: 'Widget B', qty: 1, rate: 100 }] }
+    // ];
+
+    const [quotationDetail, setQuotationDetail] = useState([]);
+    function loadData() {
+        axios.get(process.env.REACT_APP_BASEURL + "/quotationDetails")
+            .then((res) => {
+                console.log(res.data);
+                // If your API directly returns an array, use res.data
+                // If it wraps in { data: [...] }, use res.data.data
+                setQuotationDetail(res.data.data || res.data || []);
+            })
+            .catch((err) => {
+                console.error("Error loading quotations:", err);
+                setQuotationDetail([]); // safe fallback
+            });
+
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const openModal = (quotation) => {
         setSelectedQuotation(quotation);
@@ -56,23 +77,39 @@ function Quotation() {
                     </tr>
                 </thead>
                 <tbody>
-                    {quotations.map((q, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>
-                                <button className="btn btn-link p-0 text-decoration-none" onClick={() => openModal(q)}>
-                                    {q.number}
-                                </button>
-                            </td>
-                            <td>{q.customer}</td>
-                            <td>{q.date}</td>
-
-                            <td>
-                                <button className="btn btn-primary btn-sm me-2"><i className="fa-solid fa-pencil"></i> </button>
-                                <button className="btn btn-danger btn-sm"><i className="fa-solid fa-trash"></i></button>
-                            </td>
+                    {quotationDetail && quotationDetail.length > 0 ? (
+                        quotationDetail.map((q, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>
+                                    <button
+                                        className="btn btn-link p-0 text-primary fw-semibold"
+                                        onClick={() => openModal(q)}
+                                        style={{ textDecoration: "none" }}
+                                    >
+                                        {q.quotationNo}
+                                    </button>
+                                </td>
+                                <td>{q.customer}</td>
+                                <td>{q.quotationDate}</td>
+                                <td>
+                                    <div className="d-flex flex-wrap justify-content-center gap-2">
+                                        <button className="btn btn-primary btn-sm">
+                                            <i className="fa-solid fa-pencil"></i>
+                                        </button>
+                                        <button className="btn btn-danger btn-sm">
+                                            <i className="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="5" className="text-center">No quotations found</td>
                         </tr>
-                    ))}
+                    )
+                    }
                 </tbody>
             </table>
 
@@ -80,10 +117,10 @@ function Quotation() {
             {/* Modal */}
             {showModal && selectedQuotation && (
                 <>
-                    {/* Backdrop */}
+                    {/* backdrop */}
                     <div className="modal-backdrop fade show"></div>
+                    {/* modal content */}
 
-                    {/* Modal Content */}
                     <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                         <div className="modal-dialog modal-lg">
                             <div className="modal-content">
@@ -98,10 +135,10 @@ function Quotation() {
 
                                 <div className="modal-body">
                                     <p><strong>Customer:</strong> {selectedQuotation.customer}</p>
-                                    <p><strong>Date:</strong> {selectedQuotation.date}</p>
+                                    <p><strong>Date:</strong> {selectedQuotation.quotationDate}</p>
                                     <p><strong>Amount:</strong> {selectedQuotation.amount}</p>
 
-                                    {/* Table Title & Divider */}
+                                    {/* table */}
                                     <hr style={{ borderTop: '2px solid black' }} />
                                     <h6 className="mt-3 mb-3">Quotation List</h6>
 
@@ -119,8 +156,8 @@ function Quotation() {
                                                 <tr key={i}>
                                                     <td>{item.product}</td>
                                                     <td>{item.qty}</td>
-                                                    <td>${item.rate}</td>
-                                                    <td>${item.qty * item.rate}</td>
+                                                    <td>{item.rate}</td>
+                                                    <td>{item.total}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

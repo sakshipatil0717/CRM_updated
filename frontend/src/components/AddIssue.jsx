@@ -1,7 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function AddIssue() {
+
+    const navigate = useNavigate();
+
 
     // Fetch Customers
     const [customerData, setCustomerData] = useState([]);
@@ -53,17 +57,30 @@ function AddIssue() {
 
 
     // Handle Form Submission
+    // const handleSubmitIssue = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         await axios.post(process.env.REACT_APP_BASEURL + "/customer-issue", issue);
+    //         alert("Issue added successfully!");
+    //         setIssue({ customerId: "", closeDate: "", issueDate: "", employeeId: "", issue: "" }); // Clear form
+    //         // loadData();  // Reload data after adding
+    //         navigate('/issues'); // Redirect to issues page
+    //     } catch (error) {
+    //         console.error("Error adding CustomerIssue:", error);
+    //     }
+    // }
+
     const handleSubmitIssue = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(process.env.REACT_APP_BASEURL + "/customer-issue", issue);
+            const Issue = await axios.post(process.env.REACT_APP_BASEURL + "/customer-issue", issue);
             alert("Issue added successfully!");
-            setIssue({ customerId: "", closeDate: "", issueDate: "", employeeId: "", issue: "" }); // Clear form
-            // loadData();  // Reload data after adding
+            console.log(Issue);
+            setIssue({ customerId: "", employeeId: "", issue: "", issueDate: "", closeDate: "", status: "" }); // Clear form
+            navigate("/issues"); // Redirect after alert
         } catch (error) {
-            console.error("Error adding CustomerIssue:", error);
+            console.error("Error adding Customer:", error);
         }
-
     }
 
 
@@ -85,7 +102,7 @@ function AddIssue() {
 
                 <div class="container mt-4">
                     <div class="card p-5 shadow-sm">
-                        <form>
+                        <form onSubmit={handleSubmitIssue}>
                             {/* <!-- Customer & Employee in one row --> */}
                             <div class="row mb-6">
                                 <div class="col-md-6">
@@ -149,7 +166,7 @@ function AddIssue() {
 
                             {/* <!-- Buttons aligned to the right --> */}
                             <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" onClick={handleSubmitIssue} class="btn btn-success rounded-pill btn-sm me-2 px-4 py-2">Save</button>
+                                <button type="submit" class="btn btn-success rounded-pill btn-sm me-2 px-4 py-2">Save</button>
                                 <button type="reset" onClick={handleReset} class="btn btn-danger rounded-pill btn-sm px-4 py-2">Cancel</button>
                             </div>
                         </form>
@@ -162,4 +179,4 @@ function AddIssue() {
     )
 }
 
-export default AddIssue
+export default AddIssue;
